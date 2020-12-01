@@ -53,15 +53,16 @@ class Paragraph:
         pdf.set_xy(startX, pdf.get_y() + 6)
 
 class SubItem:
-    def __init__(self, heading="Lorem ipsum", text=lipsum, size=12):
+    def __init__(self, heading="Lorem ipsum", text=lipsum, size=12, link=""):
         self.heading = heading
         self.text = text
         self.size = size
+        self.link = link
 
     def place(self, pdf):
         startX = pdf.get_x()
         pdf.set_font("roboto", size=self.size+5)
-        pdf.cell(w=pdf.get_string_width(self.heading), h=1, txt=self.heading, align="C")
+        pdf.cell(w=pdf.get_string_width(self.heading), h=1, txt=self.heading, align="C", link=self.link)
         # Set indentation width for item
         pdf.set_xy(startX + 10, pdf.get_y() + self.size/2)
         pdf.set_font("roboto", size=self.size)
@@ -95,8 +96,6 @@ class Image:
 
         pdf.set_xy(startX, pdf.get_y() + 6)
 
-
-
 def main():
     pdf = FPDF()
     pdf.add_font("roboto", fname="./RobotoMono-Regular.ttf", uni=True)
@@ -106,14 +105,19 @@ def main():
     header = Header()
     header.place(pdf)
 
-    subItem = SubItem()
+    subItem = SubItem(link=1)
     subItem.place(pdf)
+    to_page_2 = pdf.add_link()
 
     paragraph = Paragraph()
     paragraph.place(pdf)
 
     image = Image("./img.jpg")
     image.place(pdf, 100, 50, align="C", caption="Fig 1.1: A fox")
+
+    pdf.add_page()
+    paragraph.place(pdf)
+    pdf.set_link(to_page_2, page=2)
 
     pdf.output("test.pdf","F")
 
